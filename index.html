@@ -1,63 +1,74 @@
-import requests
-import json
-import datetime
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="refresh" content="60">
+    <title>🏥 高榮胃腸肝膽科進度</title>
+    <style>
+        :root {
+            --primary-color: #1a73e8;
+            --danger-color: #d93025;
+            --bg-color: #f8f9fa;
+        }
+        body { 
+            font-family: -apple-system, "Microsoft JhengHei", sans-serif; 
+            background-color: var(--bg-color); 
+            margin: 0; 
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .container { width: 100%; max-width: 500px; }
+        .header { 
+            text-align: center; 
+            padding: 20px 0;
+            color: var(--primary-color);
+        }
+        .update-time { 
+            text-align: center; 
+            color: #666; 
+            font-size: 0.9em; 
+            margin-bottom: 20px;
+        }
+        .card { 
+            background: white; 
+            border-radius: 15px; 
+            padding: 25px; 
+            margin-bottom: 15px; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            border-left: 8px solid var(--primary-color);
+        }
+        .room { font-size: 1.1em; color: #5f6368; margin-bottom: 5px; }
+        .doctor { font-size: 1.6em; font-weight: bold; color: #202124; }
+        .progress { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            margin-top: 15px;
+        }
+        .label { font-size: 1.2em; color: #3c4043; }
+        .number { 
+            font-size: 3.5em; 
+            color: var(--danger-color); 
+            font-weight: 900;
+            line-height: 1;
+        }
+        .loading { text-align: center; color: #999; padding: 50px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏥 高榮看診進度</h1>
+            <div class="update-time">資料初始化中，請稍候...</div>
+        </div>
 
-def fetch_and_save():
-    url = "https://webreg.vghks.gov.tw/RSMKS/api/WWW7"
-    payload = {
-        "hospitalID": "KSVGH",
-        "apToken": "KSVGHAPP386",
-        "language": "zh-TW",
-        "userToken": "",
-        "deptName": "胃腸肝膽科",
-        "deptCode": "29"
-    }
-    headers = {
-        "Content-Type": "application/json",
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
-    }
-
-    try:
-        response = requests.post(url, json=payload, headers=headers)
-        data = response.json()
-        progress_list = data.get("body", {}).get("OPDProgressList", [])
-        
-        # 產生 HTML 內容
-        now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        html_content = f"""
-        <html>
-        <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>高榮-胃腸肝膽科進度</title>
-            <style>
-                body {{ font-family: sans-serif; padding: 20px; background: #f4f7f6; }}
-                .card {{ background: white; padding: 15px; margin-bottom: 10px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }}
-                .doctor {{ font-size: 1.2em; font-weight: bold; color: #2c3e50; }}
-                .num {{ font-size: 2em; color: #e74c3c; font-weight: bold; }}
-                .time {{ color: #7f8c8d; font-size: 0.8em; }}
-            </style>
-        </head>
-        <body>
-            <h2>🏥 胃腸肝膽科 看診進度</h2>
-            <p class="time">最後更新時間：{now}</p>
-        """
-        
-        for p in progress_list:
-            html_content += f"""
-            <div class="card">
-                <div class="doctor">診間 {p['roomName']} - {p['drName']} 醫師</div>
-                <div>目前號碼：<span class="num">{p['progNum']}</span></div>
-            </div>
-            """
-            
-        html_content += "</body></html>"
-        
-        with open("index.html", "w", encoding="utf-8") as f:
-            f.write(html_content)
-            
-    except Exception as e:
-        print(f"Error: {e}")
-
-if __name__ == "__main__":
-    fetch_and_save()
+        <div class="loading">
+            <p>正在連線至醫院系統，請等待第一次自動更新...</p>
+            <p>(每 10 分鐘自動抓取一次)</p>
+        </div>
+    </div>
+</body>
+</html>
